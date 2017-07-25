@@ -1,0 +1,13 @@
+{
+  "name": "fbcruise",
+  "version": "0.0.1",
+  "description": "Demo fb app that retrieves faqs of user from databae.",
+  "dependencies": {
+	"qs": "*"
+   },
+   "scripts": {
+    "start": "node app.js",
+    "test": "node app.js"
+  },
+  "engine": "node 0.6.x"
+}
