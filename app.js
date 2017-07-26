@@ -2,16 +2,27 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var request = require('request');
 var mysql = require('mysql');
+var cookieparser=require('cookie-parser');
 
 var app = express();
-var token = "EAAGsAdEctVYBAMKiWCP2gDMHmaOIrmpvpWepBocEQrUKV1uZAg3YiZCTqscguTY6Tkga0eiX7loCH55G7FcFJurg9qaniPemNk0fgCaJkINjDF0KMHgsmzl6qcwoYZAPzZChRaSH5fd8vqAQtT1e91bLN3VcKLBLAzGOr9NyGAZDZD";
+var token = "EAAUAGjJDe3EBALBDdKSCw0mfcOs0OUfNXoOaVYW0PzrdUrV8iHSOF6oC4wtHkZAhkep1LsFLpCkVR5VqurQotp6DTYyPdTq3SJ0W28kHmK9uXMB7qymZAvAnWf3HlHBZCwfNKZAZADNzyS7kZB0pcZAO5ZAoTVxsZAuHUVBlmGYp1RAZDZD";
 
+var cid=0;
+app.set('cid',0)
 app.set('port', (process.env.PORT || 1000))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+app.use(cookieparser)
 
 app.get('/', function (req, res) {
   res.send('Facebook Bot')
+});
+
+var con = mysql.createConnection({
+  host: "us-cdbr-iron-east-03.cleardb.net",
+  user: "b6b44c614c6637",
+  password: "980a1407",
+  database: "heroku_e98968247b42df2"
 });
 
 /*
@@ -38,52 +49,146 @@ app.post('/webhook', function (req, res) {
   if (data.object == 'page') {
     data.entry.forEach(function (pageEntry) {
       var pageID = pageEntry.id;
-      var timeOfEvent = pageEntry.time;
+      var timeOfEvent = pageEntry.time;          
       pageEntry.messaging.forEach(function (event) {
         if (event.message && event.message.text) {
-          receivedMessage(event);
+          receivedMessage(event,res,req);
         }
       });
     });
     res.sendStatus(200);
   }
 });
-var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "demo"
-});
 
-
-function receivedMessage(event) {
+con.connect(function(err){if (err) throw err;});
+function receivedMessage(event,res,req) {
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
   var message = event.message.text;
-  var messageText ="";
-  con.connect(function(err) {
-  if (err) throw err;
-  con.query("select * from faq_master where question like '%"+message+"%' and cid=0", function (err, result, fields) {
+  var messageText ="How may i help you?";
+  /*
+ con.query("SELECT * FROM cruise_master where cname like '%"+message+"%'", function (err, result, fields) {
     if (err) throw err;
-    messageText =result[0].answer;
-    console.log(result[0].answer);
+   if(result.length  > 0){
+           messageText="Welcome to "+message+" Cruise.Please feel free to ask any question.";
+            cid=result[0].cid;
+
+            var messageData = {
+          recipient: { id: senderID },
+          message: { text: messageText }
+        };
+
+        //callSendAPI(messageData);
+   }
+   else{
+     var sqlqry;
+     if(cid != 0){
+          sqlqry="SELECT * FROM faq_master where question like '%"+message+"%' and cid=0";
+     }
+     else{
+        sqlqry="SELECT * FROM faq_master where question like '%"+message+"%' and cid='"+cid+"'";
+     }
+        con.query(sqlqry, function (err, result, fields) {
+          if (err) throw err;
+          messageText =result[0].answer;
+          console.log(result[0].answer); 
+            var messageData = {
+          recipient: { id: senderID },
+          message: { text: messageText }
+        };
+
+        //callSendAPI(messageData);
+
+      });
+
+   
+   }
+     callSendAPI(messageData);
+  
+});  
+ */
+  con.query("select * from cruise_master where cname like '%"+message+"%'",function(err,result,fields){
+  	
+  	if(result.length > 0){
+		//
+		cid=result[0].cid;
+		app.set('cid', cid);
+		res.cookie('cid',cid);
+		messageText="welcome to "+message+" Cruise . Please ask que";
+		console.log(messageText);
+       var messageData = {
+          recipient: { id: senderID },
+          message: { text: messageText }
+        };
+      callSendAPI(messageData);
+	}
+	else{
+		if(req.cookies['cid']!=0){
+			con.query("SELECT * FROM faq_master where question like '%"+message+"%' and cid='"+cid+"'", function (err, result, fields) {
+		    if (err) throw err;
+		    if(result.length > 0){
+				messageText=result[0].answer;
+			}
+			else{
+				messageText="Sorry, i am not able to get you";
+			}
+		    
+		    console.log(messageText);
+        
+         var messageData = {
+          recipient: { id: senderID },
+          message: { text: messageText }
+        };
+      callSendAPI(messageData);
+        
+		  });
+			
+			
+			
+		}else{
+			con.query("SELECT * FROM faq_master where question like '%"+message+"%' and cid=0", function (err, result, fields) {
+		    if (err) throw err;
+		   if(result.length > 0){
+				messageText=result[0].answer;
+			}
+			else{
+				messageText="Sorry, i am not able to get you";
+			}
+		    console.log(messageText);
+         var messageData = {
+          recipient: { id: senderID },
+          message: { text: messageText }
+        };
+      callSendAPI(messageData);
+        
+		  });
+		}
+		//
+				
+				
+		
+		
+	}
+  	
   });
-});
- /* if(message=="hi"){
+  
+  
+  /*if(message=="hi"){
   	messageText ="I'm Siva, How can I help you ?";
   }
   else{
   	messageText ="Sorry , please say again?";
   }*/
    
-
+/*
   var messageData = {
     recipient: { id: senderID },
     message: { text: messageText }
   };
 
-  callSendAPI(messageData);
+  callSendAPI(messageData);*/
+  
 }
 
 /*
