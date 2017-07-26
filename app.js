@@ -3,8 +3,10 @@ var bodyParser = require('body-parser');
 var request = require('request');
 var mysql = require('mysql');
 var cookieparser=require('cookie-parser');
+var session=require('express-session');
 
 var app = express();
+
 var token = "EAAUAGjJDe3EBALBDdKSCw0mfcOs0OUfNXoOaVYW0PzrdUrV8iHSOF6oC4wtHkZAhkep1LsFLpCkVR5VqurQotp6DTYyPdTq3SJ0W28kHmK9uXMB7qymZAvAnWf3HlHBZCwfNKZAZADNzyS7kZB0pcZAO5ZAoTVxsZAuHUVBlmGYp1RAZDZD";
 
 var cid=0;
@@ -12,7 +14,8 @@ app.set('cid',0)
 app.set('port', (process.env.PORT || 1000))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-app.use(cookieparser)
+app.use(cookieparser())
+app.use(session({secret:'fbtoken'}));
 
 app.get('/', function (req, res) {
   res.send('Facebook Bot')
@@ -44,6 +47,7 @@ app.get('/webhook', function (req, res) {
  * All callbacks for Messenger are POST-ed. They will be sent to the same webhook.
  *
  */
+var sess;
 app.post('/webhook', function (req, res) {
   var data = req.body;
   if (data.object == 'page') {
@@ -52,7 +56,8 @@ app.post('/webhook', function (req, res) {
       var timeOfEvent = pageEntry.time;          
       pageEntry.messaging.forEach(function (event) {
         if (event.message && event.message.text) {
-          receivedMessage(event,res,req);
+        	sess=req.session;
+          receivedMessage(event,sess);
         }
       });
     });
@@ -61,7 +66,7 @@ app.post('/webhook', function (req, res) {
 });
 
 con.connect(function(err){if (err) throw err;});
-function receivedMessage(event,res,req) {
+function receivedMessage(event,sess) {
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
@@ -114,7 +119,7 @@ function receivedMessage(event,res,req) {
 		//
 		cid=result[0].cid;
 		app.set('cid', cid);
-		res.cookie('cid',cid);
+		sess.cid('cid',cid);
 		messageText="welcome to "+message+" Cruise . Please ask que";
 		console.log(messageText);
        var messageData = {
@@ -124,7 +129,7 @@ function receivedMessage(event,res,req) {
       callSendAPI(messageData);
 	}
 	else{
-		if(req.cookies['cid']!=0){
+		if(sess.cid!=0){
 			con.query("SELECT * FROM faq_master where question like '%"+message+"%' and cid='"+cid+"'", function (err, result, fields) {
 		    if (err) throw err;
 		    if(result.length > 0){
