@@ -56,7 +56,7 @@ app.post('/webhook', function (req, res) {
       var timeOfEvent = pageEntry.time;          
       pageEntry.messaging.forEach(function (event) {
         if (event.message && event.message.text) {
-        	sess=req.session;
+        	
           receivedMessage(event,sess);
         }
       });
@@ -119,7 +119,7 @@ function receivedMessage(event,sess) {
 		//
 		cid=result[0].cid;
 		app.set('cid', cid);
-		sess.cid('cid',cid);
+		
 		messageText="welcome to "+message+" Cruise . Please ask que";
 		console.log(messageText);
        var messageData = {
@@ -129,7 +129,7 @@ function receivedMessage(event,sess) {
       callSendAPI(messageData);
 	}
 	else{
-		if(sess.cid!=0){
+		if(app.get('cid')!=0){
 			con.query("SELECT * FROM faq_master where question like '%"+message+"%' and cid='"+cid+"'", function (err, result, fields) {
 		    if (err) throw err;
 		    if(result.length > 0){
