@@ -10,6 +10,7 @@ var app = express();
 var token = "EAAUAGjJDe3EBALBDdKSCw0mfcOs0OUfNXoOaVYW0PzrdUrV8iHSOF6oC4wtHkZAhkep1LsFLpCkVR5VqurQotp6DTYyPdTq3SJ0W28kHmK9uXMB7qymZAvAnWf3HlHBZCwfNKZAZADNzyS7kZB0pcZAO5ZAoTVxsZAuHUVBlmGYp1RAZDZD";
 
 var cid=0;
+app.set('cid',0);
 app.set('port', (process.env.PORT || 1000))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
