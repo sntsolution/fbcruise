@@ -132,7 +132,7 @@ function receivedMessage(event,req) {
       callSendAPI(messageData);
 	}
 	else{
-		ifapp.get('cid')!= 0){
+		if(app.get('cid')!= 0){
 			con.query("SELECT * FROM faq_master where question like '%"+message+"%' and cid='"+cid+"'", function (err, result, fields) {
 		    if (err) throw err;
 		    if(result.length > 0){
