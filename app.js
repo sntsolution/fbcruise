@@ -73,7 +73,7 @@ function receivedMessage(event,req) {
   var timeOfMessage = event.timestamp;
   var message = event.message.text;
   var messageText ="How may i help you?";
-con.connect(function(err){if (err) throw err;
+con.connect();
   con.query("select * from cruise_master where cname like '%"+message+"%'",function(err,result,fields){
   	
   	if(result.length > 0){
@@ -135,8 +135,7 @@ con.connect(function(err){if (err) throw err;
   	
   });
   
- });
-  
+con.end();
 }
 
 /*
