@@ -63,8 +63,14 @@ app.post('/webhook', function (req, res) {
       var pageID = pageEntry.id;
       var timeOfEvent = pageEntry.time;          
       pageEntry.messaging.forEach(function (event) {
-        if (event.message && event.message.text) {        	
+        if (event.message && event.message.text) {
+          if(event.message.text=="reset"){
+	     app.set('cid',0);
+             cid=0;
+	  }
+          else{
           receivedMessage(event,req);
+	  }
         }
       });
     });
