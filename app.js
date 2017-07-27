@@ -69,6 +69,7 @@ app.post('/webhook', function (req, res) {
 
 con.connect(function(err){if (err) throw err;});
 function receivedMessage(event,req) {
+  cid =0;
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
