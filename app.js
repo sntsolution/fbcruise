@@ -65,7 +65,7 @@ app.post('/webhook', function (req, res) {
   }
 });
 
-con.connect(function(err){if (err) throw err;});
+
 function receivedMessage(event,req) {
   cid =0;
   var senderID = event.sender.id;
@@ -73,7 +73,7 @@ function receivedMessage(event,req) {
   var timeOfMessage = event.timestamp;
   var message = event.message.text;
   var messageText ="How may i help you?";
-
+con.connect(function(err){if (err) throw err;
   con.query("select * from cruise_master where cname like '%"+message+"%'",function(err,result,fields){
   	
   	if(result.length > 0){
@@ -131,16 +131,11 @@ function receivedMessage(event,req) {
         
 		  });
 		}
-		//
-				
-				
-		
-		
 	}
   	
   });
   
- 
+ });
   
 }
 
