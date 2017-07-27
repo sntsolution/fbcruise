@@ -57,7 +57,7 @@ app.post('/webhook', function (req, res) {
       pageEntry.messaging.forEach(function (event) {
         if (event.message && event.message.text) {
         	
-          receivedMessage(event,sess);
+          receivedMessage(event,req);
         }
       });
     });
@@ -66,7 +66,7 @@ app.post('/webhook', function (req, res) {
 });
 
 con.connect(function(err){if (err) throw err;});
-function receivedMessage(event,sess) {
+function receivedMessage(event,req) {
   var senderID = event.sender.id;
   var recipientID = event.recipient.id;
   var timeOfMessage = event.timestamp;
@@ -124,12 +124,13 @@ function receivedMessage(event,sess) {
 		console.log(messageText);
        var messageData = {
           recipient: { id: senderID },
-          message: { text: messageText }
+          message: { text: messageText },
+	  cid:{cid : cid}
         };
       callSendAPI(messageData);
 	}
 	else{
-		if(app.get('cid')!=0){
+		if(req.query.cid != 0){
 			con.query("SELECT * FROM faq_master where question like '%"+message+"%' and cid='"+cid+"'", function (err, result, fields) {
 		    if (err) throw err;
 		    if(result.length > 0){
