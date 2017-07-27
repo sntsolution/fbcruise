@@ -36,9 +36,7 @@ var con = mysql.createConnection({
 app.get('/webhook', function (req, res) {
   if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === 'webhooktoken') {
     console.log("Validating webhook");
-    res.status(200).send(req.query['hub.challenge']);
-	  app.set('cid', 0);
-	  cid=0;
+    res.status(200).send(req.query['hub.challenge']);	
   } else {
     console.error("Failed validation. Make sure the validation tokens match.");
     res.sendStatus(403);
@@ -75,47 +73,7 @@ function receivedMessage(event,req) {
   var timeOfMessage = event.timestamp;
   var message = event.message.text;
   var messageText ="How may i help you?";
-  /*
- con.query("SELECT * FROM cruise_master where cname like '%"+message+"%'", function (err, result, fields) {
-    if (err) throw err;
-   if(result.length  > 0){
-           messageText="Welcome to "+message+" Cruise.Please feel free to ask any question.";
-            cid=result[0].cid;
 
-            var messageData = {
-          recipient: { id: senderID },
-          message: { text: messageText }
-        };
-
-        //callSendAPI(messageData);
-   }
-   else{
-     var sqlqry;
-     if(cid != 0){
-          sqlqry="SELECT * FROM faq_master where question like '%"+message+"%' and cid=0";
-     }
-     else{
-        sqlqry="SELECT * FROM faq_master where question like '%"+message+"%' and cid='"+cid+"'";
-     }
-        con.query(sqlqry, function (err, result, fields) {
-          if (err) throw err;
-          messageText =result[0].answer;
-          console.log(result[0].answer); 
-            var messageData = {
-          recipient: { id: senderID },
-          message: { text: messageText }
-        };
-
-        //callSendAPI(messageData);
-
-      });
-
-   
-   }
-     callSendAPI(messageData);
-  
-});  
- */
   con.query("select * from cruise_master where cname like '%"+message+"%'",function(err,result,fields){
   	
   	if(result.length > 0){
@@ -182,21 +140,7 @@ function receivedMessage(event,req) {
   	
   });
   
-  
-  /*if(message=="hi"){
-  	messageText ="I'm Siva, How can I help you ?";
-  }
-  else{
-  	messageText ="Sorry , please say again?";
-  }*/
-   
-/*
-  var messageData = {
-    recipient: { id: senderID },
-    message: { text: messageText }
-  };
-
-  callSendAPI(messageData);*/
+ 
   
 }
 
@@ -214,6 +158,7 @@ function callSendAPI(messageData) {
 
   }, function (error, response, body) {
     if (!error && response.statusCode == 200) {
+      app.set('cid',0);
       var recipientId = body.recipient_id;
       var messageId = body.message_id;
       console.log("Successfully sent generic message with id %s to recipient %s", messageId, recipientId);
