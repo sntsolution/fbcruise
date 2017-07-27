@@ -48,6 +48,14 @@ app.get('/webhook', function (req, res) {
  *
  */
 var sess;
+con.connect(function(err){
+ if(!err) {
+     console.log("Database is connected ... \n\n");  
+ } else {
+     console.log("Error connecting database ... \n\n");  
+ }
+ });
+
 app.post('/webhook', function (req, res) {
   var data = req.body;
   if (data.object == 'page') {
@@ -55,8 +63,7 @@ app.post('/webhook', function (req, res) {
       var pageID = pageEntry.id;
       var timeOfEvent = pageEntry.time;          
       pageEntry.messaging.forEach(function (event) {
-        if (event.message && event.message.text) {
-        	
+        if (event.message && event.message.text) {        	
           receivedMessage(event,req);
         }
       });
@@ -73,7 +80,7 @@ function receivedMessage(event,req) {
   var timeOfMessage = event.timestamp;
   var message = event.message.text;
   var messageText ="How may i help you?";
-con.connect();
+
   con.query("select * from cruise_master where cname like '%"+message+"%'",function(err,result,fields){
   	
   	if(result.length > 0){
@@ -135,7 +142,7 @@ con.connect();
   	
   });
   
-con.end();
+
 }
 
 /*
