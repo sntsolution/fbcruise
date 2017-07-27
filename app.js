@@ -87,7 +87,7 @@ function receivedMessage(event,req) {
 		cid=result[0].cid;
 		app.set('cid', cid);
 		
-		messageText="welcome to "+message+" Cruise . Please ask que";
+		messageText="welcome to "+message+" Cruise . Please ask que"+senderID+recipientID;
 		console.log(messageText);
        var messageData = {
           recipient: { id: senderID },
