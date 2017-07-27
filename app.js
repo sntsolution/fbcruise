@@ -133,7 +133,7 @@ function receivedMessage(event,req) {
 			
 			
 		}else{
-			con.query("SELECT * FROM faq_master where question like '%"+message+"%' and cid=0", function (err, result, fields) {
+			con.query("SELECT * FROM faq_master where question like '%"+message+"%'", function (err, result, fields) {
 		    if (err) throw err;
 		   if(result.length > 0){
 				messageText=result[0].answer;
