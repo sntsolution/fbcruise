@@ -38,6 +38,7 @@ app.get('/webhook', function (req, res) {
     console.log("Validating webhook");
     res.status(200).send(req.query['hub.challenge']);
 	  app.set('cid', 0);
+	  cid=0;
   } else {
     console.error("Failed validation. Make sure the validation tokens match.");
     res.sendStatus(403);
@@ -131,7 +132,7 @@ function receivedMessage(event,req) {
       callSendAPI(messageData);
 	}
 	else{
-		if(req.query['cid'] != 0){
+		ifapp.get('cid')!= 0){
 			con.query("SELECT * FROM faq_master where question like '%"+message+"%' and cid='"+cid+"'", function (err, result, fields) {
 		    if (err) throw err;
 		    if(result.length > 0){
