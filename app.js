@@ -37,6 +37,7 @@ app.get('/webhook', function (req, res) {
   if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === 'webhooktoken') {
     console.log("Validating webhook");
     res.status(200).send(req.query['hub.challenge']);
+	  app.set('cid', 0);
   } else {
     console.error("Failed validation. Make sure the validation tokens match.");
     res.sendStatus(403);
